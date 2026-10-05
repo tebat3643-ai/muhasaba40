@@ -1,1 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-x>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>محاسبة النفس — أربعون يومًا</title>
+<meta name="description" content="برنامج أربعين يومًا لمحاسبة النفس: مجاهدة يومية وجملة تشجيعية لكل يوم.">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF1E7;--ink:#17261F;--em:#0F5A44;--gold:#B07D1E;--card:#F9FAF4;--line:#CBD3C4;--mut:#5C6B62;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10201A;--ink:#E7EDE2;--em:#5FC4A0;--gold:#E0B25A;--card:#172A22;--line:#2B4439;--mut:#93A89C}}
+:root[data-theme="dark"]{--bg:#10201A;--ink:#E7EDE2;--em:#5FC4A0;--gold:#E0B25A;--card:#172A22;--line:#2B4439;--mut:#93A89C}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,Tahoma,sans-serif;line-height:1.7}
+main{max-width:480px;margin:0 auto;padding:20px 16px 40px}
+h1{font-family:Amiri,'Traditional Arabic',serif;font-size:2rem;margin:4px 0 2px;color:var(--em);text-align:center;line-height:1.3}
+.hd{font-family:Amiri,serif;text-align:center;color:var(--mut);font-size:1rem;margin:0 0 8px}
+.ring{position:relative;width:100%;max-width:340px;margin:0 auto}
+.ring svg{width:100%;height:auto;display:block}
+.mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;text-align:center}
+.mid b{font-family:Amiri,serif;font-size:3rem;line-height:1;color:var(--em)}
+.mid span{font-size:.9rem;color:var(--mut)}
+.bead{fill:none;stroke:var(--line);stroke-width:2;cursor:pointer;transition:fill .2s}
+.bead.part{fill:var(--em);fill-opacity:.35;stroke:var(--em)}
+.bead.done{fill:var(--em);stroke:var(--em)}
+.bead.cur{stroke:var(--gold);stroke-width:3}
+.bead.lock{opacity:.45;cursor:default}
+.bead.sel{stroke:var(--gold);stroke-width:4}
+.bead:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:18px}
+.quote{font-family:Amiri,serif;font-size:1.35rem;line-height:1.9;margin:0 0 14px;color:var(--ink)}
+.row{display:flex;align-items:center;gap:12px;padding:11px 2px;border-top:1px solid var(--line);cursor:pointer}
+.row input{width:22px;height:22px;accent-color:var(--em);flex:none}
+.row span{flex:1}
+.row.on span{color:var(--mut);text-decoration:line-through}
+.x{background:none;border:0;color:var(--mut);font-size:1.2rem;padding:0 6px;cursor:pointer}
+.add{display:flex;gap:8px;margin-top:12px}
+.add input{flex:1;min-width:0;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+button.b{font:inherit;font-weight:700;padding:10px 16px;border-radius:10px;border:0;background:var(--em);color:var(--bg);cursor:pointer}
+button.g{font:inherit;background:none;border:0;color:var(--mut);text-decoration:underline;cursor:pointer;margin:18px auto 0;display:block}
+.ok{color:var(--em);font-weight:700;margin:12px 0 0}
+.note{color:var(--mut);margin:0}
+</style>
+</head>
+<body>
+<main>
+<h1>محاسبة النفس</h1>
+<p class="hd">«ليس منا من لم يحاسب نفسه في كل يوم» — الإمام الكاظم (ع)</p>
+<p class="hd">﴿وَالَّذِينَ جَاهَدُوا فِينَا لَنَهْدِيَنَّهُمْ سُبُلَنَا﴾ [العنكبوت: 69]</p>
+<div class="ring"><svg id="ring" viewBox="0 0 320 320" role="group" aria-label="أيام الأربعين"></svg><div class="mid"><span>اليوم</span><b id="dn">1</b><span id="dc">أتممت 0 من 40</span></div></div>
+<div class="card" id="panel"></div>
+<button class="g" id="reset">ابدأ الأربعين من جديد</button>
+</main>
+<script>
+var Q=["ابدأ بنية صادقة، والله يعين من يخطو الخطوة الأولى.","اليوم الثاني أثبت من الأول؛ العادة تبدأ بالتكرار.","إن زلّت قدمك فلا تيأس، قم وتب وأكمل.","اللهم صلِّ على محمد وآل محمد، واستعن بهم على نفسك.","احفظ لسانك اليوم؛ الكلمة الطيبة صدقة.","جهاد النفس أعظم الجهاد، وأنت فيه اليوم.","أسبوع كامل! ما أجمل أن ترى نفسك تتغير.","من ترك شيئًا لله عوّضه الله خيرًا منه.","اجعل لك لحظة خلوة مع الله قبل نومك.","عشرة أيام؛ ربع الطريق خلفك، فاثبت.","اغضب قليلًا وتبسّم كثيرًا؛ الحلم زينة المؤمن.","لا تحتقر عملًا صغيرًا؛ القطرة تصنع النهر.","قلبك يصفو كلما ابتعد عن الذنب.","أسبوعان! ثباتك اليوم يهزم ضعف الأمس.","تذكّر لماذا بدأت، وجدّد النية.","الدعاء سلاح المؤمن؛ ادعُ لنفسك ولمن تحب.","كن اليوم عونًا لأحد؛ قضاء حاجة أخيك عبادة.","إن ثقلت عليك الطاعة فاستعن بالصبر والصلاة.","كل يوم تثبت فيه هو انتصار حقيقي.","نصف الطريق! الله يرى مجاهدتك ولا يضيعها.","واحد وعشرون يومًا، والعادة الجديدة تتجذّر.","تصدّق اليوم ولو بالقليل؛ يدفع الله به البلاء.","لا تقارن نفسك بغيرك، قارن بين أمسك واليوم.","اذكر الله في خلوتك كما تذكره بين الناس.","ما تركته لله لن يضيع، وسيعود نورًا في قلبك.","أحسن الظن بالله، فهو أرحم بك من نفسك.","اقرأ شيئًا من القرآن اليوم وتدبّر آية واحدة.","قاربت الأسابيع الأربعة، فلا تتراخَ الآن.","اطلب العفو والستر، وسامح من أخطأ بحقك.","ثلاثون يومًا! تغيّرت أكثر مما تظن.","الشكر يزيد النعمة؛ اشكر الله على توفيقه.","اجعل ذكر أهل البيت (ع) نورًا يهديك.","لا تدع الغرور يدخل قلبك، فالتوفيق من الله.","قلبك اليوم أهدأ، وهذا ثمرة جهادك.","ما بقي أقل مما مضى، فواصل بقوة.","اطمئن؛ الذي بدأ بك الطريق سيوصلك آخره.","حافظ على ما اكتسبته، فالثبات أصعب من البداية.","اجعل الأيام القادمة بداية لا نهاية.","غدًا آخر يوم، فاجعل اليوم خالصًا لوجه الله.","أتممت الأربعين! الحمد لله، واسأله الثبات بعدها."];
+var K='muhasaba40v2',D=864e5;
+function iso(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function mid(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2])}
+function def(){return{start:iso(new Date()),n:16,items:[{id:1,t:'ترك الغيبة'},{id:2,t:'ترك النميمة'},{id:3,t:'ترك سوء الظن'},{id:4,t:'حفظ اللسان من الكلمة السيئة'},{id:5,t:'ترك التنمر والسخرية'},{id:6,t:'ترك العصبية'},{id:7,t:'ترك الأغاني'},{id:8,t:'ترك العلاقات المحرمة'},{id:9,t:'بر الوالدين وترك العقوق'},{id:10,t:'الخوف من الأمن من مكر الله'},{id:11,t:'تصحيح النية وترك النية السيئة'},{id:12,t:'الصلاة في أول وقتها'},{id:13,t:'قراءة القرآن'},{id:14,t:'تعلّم شيء نافع (ضد الجهل)'},{id:15,t:'محاسبة النفس قبل النوم'}],days:{}}}
+var S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
+if(!S||!S.items)S=def();
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+function cur(){var t=new Date();t=new Date(t.getFullYear(),t.getMonth(),t.getDate());return Math.min(40,Math.max(1,Math.round((t-mid(S.start))/D)+1))}
+var C=cur(),sel=C;
+function cnt(d){var x=S.days[d]||{},n=0;S.items.forEach(function(i){if(x[i.id])n++});return n}
+function full(d){return S.items.length>0&&cnt(d)===S.items.length}
+function ring(){
+  var h='',done=0;
+  for(var d=1;d<=40;d++){
+    var a=(d-1)/40*2*Math.PI-Math.PI/2,x=160+132*Math.cos(a),y=160+132*Math.sin(a),c='bead',n=cnt(d);
+    if(full(d)){c+=' done';done++}else if(n>0)c+=' part';
+    if(d===C)c+=' cur';if(d>C)c+=' lock';if(d===sel)c+=' sel';
+    h+='<circle class="'+c+'" data-d="'+d+'" cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(d===sel?10:8)+'" tabindex="0" role="button" aria-label="اليوم '+d+'"/>';
+  }
+  document.getElementById('ring').innerHTML=h;
+  document.getElementById('dn').textContent=sel;
+  document.getElementById('dc').textContent='أتممت '+done+' من 40';
+}
+function panel(){
+  var p=document.getElementById('panel'),h='<p class="quote">'+Q[sel-1]+'</p>';
+  if(sel>C){p.innerHTML=h+'<p class="note">هذا اليوم لم يحن بعد. ارجع إليه في موعده بإذن الله.</p>';return}
+  var x=S.days[sel]||{};
+  S.items.forEach(function(i){h+='<label class="row'+(x[i.id]?' on':'')+'"><input type="checkbox" data-i="'+i.id+'"'+(x[i.id]?' checked':'')+'><span>'+i.t.replace(/</g,'&lt;')+'</span><button class="x" data-r="'+i.id+'" aria-label="حذف">×</button></label>'});
+  h+='<div class="add"><input id="ni" placeholder="أضف مجاهدة خاصة بك" maxlength="60"><button class="b" id="na">إضافة</button></div>';
+  if(full(sel))h+='<p class="ok">'+(sel===40?'أتممت الأربعين، تقبّل الله منك.':'أتممت مجاهدة اليوم، بارك الله فيك.')+'</p>';
+  p.innerHTML=h;
+}
+function all(){ring();panel()}
+document.getElementById('ring').addEventListener('click',function(e){var d=+e.target.getAttribute('data-d');if(d){sel=d;all()}});
+document.getElementById('ring').addEventListener('keydown',function(e){var d=+e.target.getAttribute('data-d');if(d&&(e.key==='Enter'||e.key===' ')){e.preventDefault();sel=d;all()}});
+document.getElementById('panel').addEventListener('click',function(e){
+  var t=e.target;
+  if(t.getAttribute('data-r')){e.preventDefault();var r=+t.getAttribute('data-r');S.items=S.items.filter(function(i){return i.id!==r});save();all();return}
+  if(t.id==='na')add();
+});
+document.getElementById('panel').addEventListener('change',function(e){
+  var i=e.target.getAttribute('data-i');if(!i)return;
+  S.days[sel]=S.days[sel]||{};S.days[sel][i]=e.target.checked;save();all();
+});
+document.getElementById('panel').addEventListener('keydown',function(e){if(e.target.id==='ni'&&e.key==='Enter')add()});
+function add(){var v=document.getElementById('ni').value.trim();if(!v)return;S.items.push({id:S.n++,t:v});save();all()}
+var rb=document.getElementById('reset'),arm=false;
+rb.onclick=function(){
+  if(!arm){arm=true;rb.textContent='اضغط مرة ثانية للتأكيد، سيُمسح كل التقدم';setTimeout(function(){arm=false;rb.textContent='ابدأ الأربعين من جديد'},4000);return}
+  S=def();save();C=cur();sel=C;arm=false;rb.textContent='ابدأ الأربعين من جديد';all();
+};
+save();all();
+</script>
+</body>
+</html>
 
