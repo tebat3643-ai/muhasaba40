@@ -24,6 +24,7 @@ h1{font-family:Amiri,'Traditional Arabic',serif;font-size:2rem;margin:4px 0 2px;
 .bead{fill:none;stroke:var(--line);stroke-width:2;cursor:pointer;transition:fill .2s}
 .bead.part{fill:var(--em);fill-opacity:.35;stroke:var(--em)}
 .bead.done{fill:var(--em);stroke:var(--em)}
+.bead.tab{fill:var(--gold);fill-opacity:.55;stroke:var(--gold)}
 .bead.cur{stroke:var(--gold);stroke-width:3}
 .bead.lock{opacity:.45;cursor:default}
 .bead.sel{stroke:var(--gold);stroke-width:4}
@@ -41,6 +42,11 @@ button.b{font:inherit;font-weight:700;padding:10px 16px;border-radius:10px;borde
 button.g{font:inherit;background:none;border:0;color:var(--mut);text-decoration:underline;cursor:pointer;margin:18px auto 0;display:block}
 .ok{color:var(--em);font-weight:700;margin:12px 0 0}
 .note{color:var(--mut);margin:0}
+.rep{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.rep .note{margin-bottom:10px}
+.bn{background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:16px;margin:0 0 16px;text-align:center}
+.bn .quote{margin:0 0 8px;font-size:1.25rem}
+.bn .note{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -48,6 +54,7 @@ button.g{font:inherit;background:none;border:0;color:var(--mut);text-decoration:
 <h1>محاسبة النفس</h1>
 <p class="hd">«ليس منا من لم يحاسب نفسه في كل يوم» — الإمام الكاظم (ع)</p>
 <p class="hd">﴿وَالَّذِينَ جَاهَدُوا فِينَا لَنَهْدِيَنَّهُمْ سُبُلَنَا﴾ [العنكبوت: 69]</p>
+<div id="bn"></div>
 <div class="ring"><svg id="ring" viewBox="0 0 320 320" role="group" aria-label="أيام الأربعين"></svg><div class="mid"><span>اليوم</span><b id="dn">1</b><span id="dc">أتممت 0 من 40</span></div></div>
 <div class="card" id="panel"></div>
 <button class="g" id="reset">ابدأ الأربعين من جديد</button>
@@ -57,25 +64,26 @@ var Q=["ابدأ بنية صادقة، والله يعين من يخطو الخ�
 var K='muhasaba40v2',D=864e5;
 function iso(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 function mid(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2])}
-function def(){return{start:iso(new Date()),n:16,items:[{id:1,t:'ترك الغيبة'},{id:2,t:'ترك النميمة'},{id:3,t:'ترك سوء الظن'},{id:4,t:'حفظ اللسان من الكلمة السيئة'},{id:5,t:'ترك التنمر والسخرية'},{id:6,t:'ترك العصبية'},{id:7,t:'ترك الأغاني'},{id:8,t:'ترك العلاقات المحرمة'},{id:9,t:'بر الوالدين وترك العقوق'},{id:10,t:'الخوف من الأمن من مكر الله'},{id:11,t:'تصحيح النية وترك النية السيئة'},{id:12,t:'الصلاة في أول وقتها'},{id:13,t:'قراءة القرآن'},{id:14,t:'تعلّم شيء نافع (ضد الجهل)'},{id:15,t:'محاسبة النفس قبل النوم'}],days:{}}}
+function def(){return{start:iso(new Date()),n:16,items:[{id:1,t:'ترك الغيبة'},{id:2,t:'ترك النميمة'},{id:3,t:'ترك سوء الظن'},{id:4,t:'حفظ اللسان من الكلمة السيئة'},{id:5,t:'ترك التنمر والسخرية'},{id:6,t:'ترك العصبية'},{id:7,t:'ترك الأغاني'},{id:8,t:'ترك العلاقات المحرمة'},{id:9,t:'بر الوالدين وترك العقوق'},{id:10,t:'الخوف من الأمن من مكر الله'},{id:11,t:'تصحيح النية وترك النية السيئة'},{id:12,t:'الصلاة في أول وقتها'},{id:13,t:'قراءة القرآن'},{id:14,t:'تعلّم شيء نافع (ضد الجهل)'},{id:15,t:'محاسبة النفس قبل النوم'}],days:{},tab:{}}}
 var S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
 if(!S||!S.items)S=def();
+if(!S.tab)S.tab={};
 function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
 function cur(){var t=new Date();t=new Date(t.getFullYear(),t.getMonth(),t.getDate());return Math.min(40,Math.max(1,Math.round((t-mid(S.start))/D)+1))}
 var C=cur(),sel=C;
 function cnt(d){var x=S.days[d]||{},n=0;S.items.forEach(function(i){if(x[i.id])n++});return n}
 function full(d){return S.items.length>0&&cnt(d)===S.items.length}
 function ring(){
-  var h='',done=0;
+  var h='',done=0,tabs=0;
   for(var d=1;d<=40;d++){
     var a=(d-1)/40*2*Math.PI-Math.PI/2,x=160+132*Math.cos(a),y=160+132*Math.sin(a),c='bead',n=cnt(d);
-    if(full(d)){c+=' done';done++}else if(n>0)c+=' part';
+    if(full(d)){c+=' done';done++}else if(S.tab[d]){c+=' tab';tabs++}else if(n>0)c+=' part';
     if(d===C)c+=' cur';if(d>C)c+=' lock';if(d===sel)c+=' sel';
     h+='<circle class="'+c+'" data-d="'+d+'" cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(d===sel?10:8)+'" tabindex="0" role="button" aria-label="اليوم '+d+'"/>';
   }
   document.getElementById('ring').innerHTML=h;
   document.getElementById('dn').textContent=sel;
-  document.getElementById('dc').textContent='أتممت '+done+' من 40';
+  document.getElementById('dc').textContent='أتممت '+done+' من 40'+(tabs?' · تبت '+tabs:'');
 }
 function panel(){
   var p=document.getElementById('panel'),h='<p class="quote">'+Q[sel-1]+'</p>';
@@ -84,14 +92,25 @@ function panel(){
   S.items.forEach(function(i){h+='<label class="row'+(x[i.id]?' on':'')+'"><input type="checkbox" data-i="'+i.id+'"'+(x[i.id]?' checked':'')+'><span>'+i.t.replace(/</g,'&lt;')+'</span><button class="x" data-r="'+i.id+'" aria-label="حذف">×</button></label>'});
   h+='<div class="add"><input id="ni" placeholder="أضف مجاهدة خاصة بك" maxlength="60"><button class="b" id="na">إضافة</button></div>';
   if(full(sel))h+='<p class="ok">'+(sel===40?'أتممت الأربعين، تقبّل الله منك.':'أتممت مجاهدة اليوم، بارك الله فيك.')+'</p>';
+  if(sel<C&&!full(sel)){h+=S.tab[sel]?'<p class="ok">تقبّل الله توبتك، أكمل من حيث وصلت.</p><button class="g" id="untab">تراجع</button>':'<div class="rep"><p class="note">فاتك شيء من هذا اليوم؟ باب التوبة مفتوح.</p><button class="b" id="tab">تبت وأكمل</button></div>'}
   p.innerHTML=h;
 }
+function banner(){
+  var b=document.getElementById('bn');
+  if(C<2||S.seen===C){b.innerHTML='';return}
+  var m=C===2?'مبارك! بدأ اليوم الثاني. العادة تبدأ بالتكرار، فاثبت وأكمل.':'بدأ اليوم '+C+'. جدّد نيتك وابدأ مجاهدتك.';
+  var y=C-1,t=full(y)?'أكملت مجاهدة أمس، بارك الله فيك.':(S.tab[y]?'':'أنجزت أمس '+cnt(y)+' من '+S.items.length+'.');
+  b.innerHTML='<div class="bn"><p class="quote">'+m+'</p>'+(t?'<p class="note">'+t+'</p>':'')+'<button class="b" id="bok">حسنًا</button></div>';
+}
 function all(){ring();panel()}
+document.getElementById('bn').addEventListener('click',function(e){if(e.target.id==='bok'){S.seen=C;save();banner()}});
 document.getElementById('ring').addEventListener('click',function(e){var d=+e.target.getAttribute('data-d');if(d){sel=d;all()}});
 document.getElementById('ring').addEventListener('keydown',function(e){var d=+e.target.getAttribute('data-d');if(d&&(e.key==='Enter'||e.key===' ')){e.preventDefault();sel=d;all()}});
 document.getElementById('panel').addEventListener('click',function(e){
   var t=e.target;
   if(t.getAttribute('data-r')){e.preventDefault();var r=+t.getAttribute('data-r');S.items=S.items.filter(function(i){return i.id!==r});save();all();return}
+  if(t.id==='tab'){S.tab[sel]=true;save();all();return}
+  if(t.id==='untab'){delete S.tab[sel];save();all();return}
   if(t.id==='na')add();
 });
 document.getElementById('panel').addEventListener('change',function(e){
@@ -103,10 +122,9 @@ function add(){var v=document.getElementById('ni').value.trim();if(!v)return;S.i
 var rb=document.getElementById('reset'),arm=false;
 rb.onclick=function(){
   if(!arm){arm=true;rb.textContent='اضغط مرة ثانية للتأكيد، سيُمسح كل التقدم';setTimeout(function(){arm=false;rb.textContent='ابدأ الأربعين من جديد'},4000);return}
-  S=def();save();C=cur();sel=C;arm=false;rb.textContent='ابدأ الأربعين من جديد';all();
+  S=def();save();C=cur();sel=C;arm=false;rb.textContent='ابدأ الأربعين من جديد';all();banner();
 };
-save();all();
+save();all();banner();
 </script>
 </body>
 </html>
-
